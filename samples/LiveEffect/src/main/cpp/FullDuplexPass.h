@@ -75,17 +75,8 @@ public:
         int32_t samplesPerFrame = outputStream->getChannelCount();
         int32_t numInputSamples = numInputFrames * samplesPerFrame;
         int32_t numOutputSamples = numOutputFrames * samplesPerFrame;
-// float l;
-        //  float N;
-        int32_t samplesToProcess = std::min(numInputSamples, numOutputSamples);
-        // It is possible that there may be fewer input than output samples.
-//        for (int32_t i = 0; i < samplesToProcess; i++) {
-//            l = static_cast<float>(i);
-//            N = static_cast<float>(samplesToProcess);
-//            ALOG("float: %f", *inputFloats);
-//            *outputFloats++ = *inputFloats++ * sin(2.0 * l * M_PI / N); // do some arbitrary processing
-//        }
 
+        int32_t samplesToProcess = std::min(numInputSamples, numOutputSamples);
         for(int i = 0; i < samplesToProcess; i++)
         {
             inputSamplesCache[i] = *(inputFloats + i);

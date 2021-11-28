@@ -24,6 +24,22 @@
 #include "FullDuplexStream.h"
 
 class FullDuplexPass : public FullDuplexStream {
+private:
+    float inputSamplesCache[384];
+    float outputSamplesCache[384];
+    float *combineArrays(float *array1, const float *array2, int finalSize) {
+        float *array3 = nullptr;
+
+        array3 = new float [finalSize];
+
+        for(int x = 0; x < finalSize/2; x++) {
+            array3[x] = array1[x];
+        }
+        for(int y = 0, k = finalSize/2; k < finalSize && y < finalSize/2; y++, k++) {
+            array3[k] = array2[y];
+        }
+        return array3;
+    }
 public:
     TfLiteModel * model;
     TfLiteInterpreterOptions* options;
@@ -59,20 +75,20 @@ public:
         int32_t samplesPerFrame = outputStream->getChannelCount();
         int32_t numInputSamples = numInputFrames * samplesPerFrame;
         int32_t numOutputSamples = numOutputFrames * samplesPerFrame;
-       // float l;
-      //  float N;
-       // int32_t samplesToProcess = std::min(numInputSamples, numOutputSamples);
-        // It is possible that there may be fewer input than output samples.
-//        for (int32_t i = 0; i < samplesToProcess; i++) {
-//            l = static_cast<float>(i);
-//            N = static_cast<float>(samplesToProcess);
-//            ALOG("float: %f", *inputFloats);
-//            *outputFloats++ = *inputFloats++ * sin(2.0 * l * M_PI / N); // do some arbitrary processing
-//        }
-            ALOG("float: %f", *inputFloats);
+
+        int32_t samplesToProcess = std::min(numInputSamples, numOutputSamples);
+        for(int i = 0; i < samplesToProcess; i++)
+        {
+            inputSamplesCache[i] = *(inputFloats + i);
+            ALOG("samplesCache[%i]= %f", i, inputSamplesCache[i]);
+        }
+
+        float* cache = inputSamplesCache;
+        const float* finalInput = combineArrays(cache, inputFloats, 768 );
+
         TfLiteTensorCopyFromBuffer(
                 input_tensor,
-                inputFloats,
+                finalInput,
                 TfLiteTensorByteSize(input_tensor));
         TfLiteInterpreterInvoke(interpreter);
         TfLiteTensorCopyToBuffer(

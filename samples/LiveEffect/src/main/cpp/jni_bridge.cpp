@@ -20,6 +20,9 @@
 
 static const int kOboeApiAAudio = 0;
 static const int kOboeApiOpenSLES = 1;
+#define  LOG_TAG    "testjni"
+
+#define  ALOG(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
 static LiveEffectEngine *engine = nullptr;
 
@@ -128,6 +131,7 @@ Java_com_google_oboe_samples_liveEffect_LiveEffectEngine_native_1setDefaultStrea
                                                jclass type,
                                                jint sampleRate,
                                                jint framesPerBurst) {
+    ALOG("sample rate is here: %d", sampleRate);
     oboe::DefaultStreamValues::SampleRate = (int32_t) sampleRate;
     oboe::DefaultStreamValues::FramesPerBurst = (int32_t) framesPerBurst;
 }

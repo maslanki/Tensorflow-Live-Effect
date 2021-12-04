@@ -31,7 +31,7 @@ public:
     TfLiteTensor * input_tensor;
     const TfLiteTensor * output_tensor;
     FullDuplexPass() {
-        model = TfLiteModelCreateFromFile("/data/data/com.google.oboe.samples.liveeffect/model.tflite");
+        model = TfLiteModelCreateFromFile("/data/data/com.google.oboe.samples.liveeffect/6-2warstwy.tflite");
         options = TfLiteInterpreterOptionsCreate();
         interpreter = TfLiteInterpreterCreate(model, options);
         TfLiteInterpreterAllocateTensors(interpreter);
@@ -59,17 +59,8 @@ public:
         int32_t samplesPerFrame = outputStream->getChannelCount();
         int32_t numInputSamples = numInputFrames * samplesPerFrame;
         int32_t numOutputSamples = numOutputFrames * samplesPerFrame;
-       // float l;
-      //  float N;
-       // int32_t samplesToProcess = std::min(numInputSamples, numOutputSamples);
-        // It is possible that there may be fewer input than output samples.
-//        for (int32_t i = 0; i < samplesToProcess; i++) {
-//            l = static_cast<float>(i);
-//            N = static_cast<float>(samplesToProcess);
-//            ALOG("float: %f", *inputFloats);
-//            *outputFloats++ = *inputFloats++ * sin(2.0 * l * M_PI / N); // do some arbitrary processing
-//        }
-            ALOG("float: %f", *inputFloats);
+
+        ALOG("float: %f", *inputFloats);
         TfLiteTensorCopyFromBuffer(
                 input_tensor,
                 inputFloats,
@@ -79,7 +70,12 @@ public:
                 output_tensor,
                 outputFloats,
                 TfLiteTensorByteSize(output_tensor));
+        int32_t samplesToProcess = std::min(numInputSamples, numOutputSamples);
 
+        for (int32_t i = 0; i < samplesToProcess; i++)
+        {
+            *outputFloats++ *= 10;
+        }
 
         // If there are fewer input samples then clear the rest of the buffer.
         int32_t samplesLeft = numOutputSamples - numInputSamples;
